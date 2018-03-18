@@ -33,11 +33,11 @@ try{
 
 	switch($e->getCode()){
 		case 1049:
-			header("location: " . $putanjaAPP . "greske/kriviNazivBaze.html");
+			header("location: " . $putanjaApp . "greske/kriviNazivBaze.html");
 			exit;
 			break;
 		default:
-			header("location: " . $putanjaAPP . "greske/greska.php?code=" . $e->getCode());
+			header("location: " . $putanjaApp . "greske/greska.php?code=" . $e->getCode());
 			exit;
 			break;
 	}
