@@ -9,9 +9,7 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
   $sql2 = "SELECT * FROM brand WHERE id = '$edit_id'";
   $edit_result = $izraz=$veza->prepare($sql2);
   $eBrand = $izraz->execute();
-  print("Fetch all of the remaining rows in the result set:\n");
-$eBrand = $izraz->fetch();
-print_r($eBrand);
+  $eBrand = $izraz->fetch();
 
 }
 
@@ -30,6 +28,9 @@ print_r($eBrand);
 
      //ako postoji u bazi
      $izraz=$veza->prepare("SELECT * FROM brand WHERE brand ='$brand'");
+     if(isset($_GET['edit'])){
+        $izraz=$veza->prepare("SELECT * FROM brand WHERE brand = '$brand' AND id != '$edit_id'");
+     }
    	$izraz->execute(array("brand"=>$_POST['brand']));
    	$sifra = $izraz->fetchColumn();
    	if($sifra>0){
@@ -43,6 +44,9 @@ print_r($eBrand);
 
      //dodavanje u bazu
      $izraz=$veza->prepare("INSERT INTO brand (brand) VALUES ('$brand')");
+     if(isset($_GET['edit'])){
+       $izraz=$veza->prepare("UPDATE brand SET brand = '$brand' WHERE id = '$edit_id'");
+     }
      $izraz->execute();
      header("Location: brands.php");
 
@@ -93,7 +97,10 @@ print_r($eBrand);
                               <div class="large-12 columns">
                                 <div class="row collapse">
                                   <div class="small-10 columns">
-                                    <?php if(isset($_GET['edit'])){
+                                    <?php
+                                    $brand_value = "";
+
+                                     if(isset($_GET['edit'])){
                                       $brand_value =$eBrand['brand'];
                                     }else {
                                       if(isset($_POST['brand'])){
