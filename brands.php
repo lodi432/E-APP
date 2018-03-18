@@ -93,6 +93,9 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
                                   </div>
                                   <div class="small-2 columns">
                                     <input type="submit" name="add_submit" value="<?=((isset($_GET['edit']))?'Edit':'Add a');?> Brend" class="button postfix">
+                                    <?php if(isset($_GET['edit'])): ?>
+                                    <a href="brands.php" class="button alert"> Cancle</a>
+                                  <?php endif;?>
                                   </div>
                                 </div>
                               </div>
