@@ -7,6 +7,11 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
   $edit_id = (int)$_GET['edit'];
   $edit_id = sanitize($edit_id);
   $sql2 = "SELECT * FROM brand WHERE id = '$edit_id'";
+  $edit_result = $izraz=$veza->prepare($sql2);
+  $eBrand = $izraz->execute();
+  print("Fetch all of the remaining rows in the result set:\n");
+$eBrand = $izraz->fetch();
+print_r($eBrand);
 
 }
 
@@ -88,8 +93,14 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
                               <div class="large-12 columns">
                                 <div class="row collapse">
                                   <div class="small-10 columns">
-
-                                    <input type="text" name="brand" id="brand" value="<?=((isset($_POST['brand']))?$_POST['brand']:'');?>" placeholder="Dodaj novi">
+                                    <?php if(isset($_GET['edit'])){
+                                      $brand_value =$eBrand['brand'];
+                                    }else {
+                                      if(isset($_POST['brand'])){
+                                        $brand_value =sanitize($_POST['brand']);
+                                      }
+                                    } ?>
+                                    <input type="text" name="brand" id="brand" value="<?=$brand_value;?>" >
                                   </div>
                                   <div class="small-2 columns">
                                     <input type="submit" name="add_submit" value="<?=((isset($_GET['edit']))?'Edit':'Add a');?> Brend" class="button postfix">
