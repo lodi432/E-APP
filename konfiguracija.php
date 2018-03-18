@@ -3,23 +3,31 @@
 session_start();
 
 
+require_once $_SERVER['DOCUMENT_ROOT'].'/FoundationFlex/config.php';
+require_once BASEURL.'helpers/helpers.php';
+
+
+
+//$putanjaAPP = "http://localhost/FoundationFlex";
+//$putanjaApp = "/projects/FoundationFlex/";
+
 $putanjaApp = "/EcomApp/";
-$naslovAPP="EComApp";
-$appID="EAPP";
+$naslovAPP="RIIS";
+$appID="EDUNOVAAPP";
 
 
 $brojRezultataPoStranici=7;
-if($_SERVER["HTTP_HOST"]===""){
-	$host="";
-	$dbname="";
-	$dbuser="";
-	$dbpass="";
+if($_SERVER["HTTP_HOST"]==="edunovanastava.byethost33.com"){
+	$host="sql301.byethost18.com";
+	$dbname="b18_21047707_pp16";
+	$dbuser="b18_21047707";
+	$dbpass="Edunova123";
 	$dev=false;
 }else{
 	$host="localhost";
 	$dbname="ecom244";
 	$dbuser="root";
-	$dbpass="";
+	$dbpass="kontrolf1";
 	$dev=true;
 }
 
@@ -33,11 +41,11 @@ try{
 
 	switch($e->getCode()){
 		case 1049:
-			header("location: " . $putanjaApp . "greske/kriviNazivBaze.html");
+			header("location: " . $putanjaAPP . "greske/kriviNazivBaze.html");
 			exit;
 			break;
 		default:
-			header("location: " . $putanjaApp . "greske/greska.php?code=" . $e->getCode());
+			header("location: " . $putanjaAPP . "greske/greska.php?code=" . $e->getCode());
 			exit;
 			break;
 	}
