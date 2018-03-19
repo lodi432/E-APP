@@ -2,7 +2,7 @@
 function display_errors ($errors) {
   $display = '<ul class="error">';
   foreach ($errors as $error) {
-    $display .= '<li class="error">'.$error.'</li>';
+    $display .= '<li class="error" >'.$error.'</li>';
   }
   $display .= '</ul>';
   return $display;

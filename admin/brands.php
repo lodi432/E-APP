@@ -78,7 +78,7 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
   <div class="grid-container">
         <?php include_once "includes/izbornik.php";
         ?>
-
+<br><br><br>
 <div class="grid-x grid-padding-x">
   <div class="large-12 cell">
     <table>
@@ -121,6 +121,8 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
                               </div>
                             </div>
                 </form>
+
+
 
 
                 <?php
