@@ -11,6 +11,7 @@
                 <ul class="menu menu-desktop">
                     <li><a href="#">Products</a></li>
                     <li><a href="<?php echo $putanjaApp;?>admin/brands.php">Brands</a></li>
+                    <li><a href="categories.php">Categories</a></li>
                     <li><a href="#">Etc</a></li>
                 </ul>
             </div>

@@ -63,7 +63,6 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
 
  <head>
         <?php include_once "includes/head.php"; ?>
-
         <style>
           table tbody tr td:nth-child(2),
           table tbody tr td:nth-child(3),
@@ -73,13 +72,12 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
         </style>
 </head>
 
+
+
 <body>
   <div class="grid-container">
         <?php include_once "includes/izbornik.php";
-
-
         ?>
-
 
 <div class="grid-x grid-padding-x">
   <div class="large-12 cell">
@@ -90,13 +88,15 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
     							<th>Akcija</th>
     						</tr>
     					</thead>
-    					<tbody>
+  					<tbody>
+
+
 <br>
                 <form action = "brands.php<?=((isset($_GET['edit']))?'?edit='.$edit_id:'');?>" method="post">
                           <div class="row">
                               <div class="large-12 columns">
                                 <div class="row collapse">
-                                  <div class="small-10 columns">
+                                  <div class="small-4 columns">
                                     <?php
                                     $brand_value = "";
 
@@ -109,10 +109,12 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
                                     } ?>
                                     <input type="text" name="brand" id="brand" value="<?=$brand_value;?>" >
                                   </div>
-                                  <div class="small-2 columns">
-                                    <input type="submit" name="add_submit" value="<?=((isset($_GET['edit']))?'Edit':'Add a');?> Brend" class="button postfix">
+                                    <p style="margin-left: 10px;"><p>
+                                  <div class="small-7 columns">
+
+                                    <input type="submit" name="add_submit" value="<?=((isset($_GET['edit']))?'Edit':'Add a');?> Brand" class="button postfix">
                                     <?php if(isset($_GET['edit'])): ?>
-                                    <a href="brands.php" class="button alert"> Cancle</a>
+                                    <a href="brands.php" class="button custom">Cancel</a>
                                   <?php endif;?>
                                   </div>
                                 </div>
@@ -120,23 +122,17 @@ if (isset($_GET['edit']) && !empty($_GET['edit'])) {
                             </div>
                 </form>
 
-                <hr>
 
                 <?php
-
-
 					$izraz = $veza->prepare("SELECT * FROM brand ORDER BY brand ;");
 					$izraz->execute();
 					$rezultati = $izraz->fetchAll(PDO::FETCH_OBJ);
 					foreach ($rezultati as $red):
-
           ?>
-
 
 						<tr>
 							<td><?php echo $red->brand; ?></td>
-
-							<td>
+						<td>
 								<a href="?edit=<?php echo $red->id; ?>"><i class="far fa-edit fa-2x"></i></a>
 								<!-- <?php if($red->brand==0): ?> -->
 								<a href="brisanje.php?sifra=<?php echo $red->id; ?>"><i class="far fa-trash-alt fa-2x"></i></a>
