@@ -10,6 +10,34 @@
 
 
 $errors = array();
+
+//Brisanje kategorije
+
+if(isset($_GET['delete']) && !empty($_GET['delete'])){
+  $delete_id = (int)$_GET['delete'];
+  $delete_id = sanitize($delete_id);
+
+//Brisanje kategorije ako je Parent obrisan
+  $sql= $veza->prepare ("SELECT * FROM categories WHERE id = $delete_id");
+   $sql->execute(array('delete_id' => $delete_id));
+  $category = $sql->fetch(PDO::FETCH_ASSOC);
+  if($category['parent'] == 0){
+
+    $sql= $veza->prepare("DELETE FROM categories WHERE parent = $delete_id");
+    $sql->execute();
+  }
+
+
+
+  $dsql=$veza->prepare("DELETE FROM categories WHERE id = '$delete_id'");
+	$dsql->execute($_GET);
+  header("location: categories.php");
+
+
+}
+
+
+
 //Procesiranje forme
 if (isset($_POST) && !empty($_POST)){
   $parent = sanitize($_POST['parent']);
