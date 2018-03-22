@@ -84,3 +84,7 @@ background-color: #52ADCB;
     z-index: 0;
   }
 }
+
+#add-product-btn{
+  margin-top: -35px;
+}
