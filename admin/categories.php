@@ -10,27 +10,40 @@
 
 
 $errors = array();
+$category='';
+$post_parent='';
+
+
+
+//Edit Kategorije
+if(isset($_GET['edit']) && !empty($_GET['edit'])){
+  $edit_id = (int)$_GET['edit'];
+  $edit_id=sanitize($edit_id);
+
+  $edit_sql= $veza->prepare ("SELECT * FROM categories WHERE id = :edit_id");
+  $edit_sql->execute(array('edit_id' => $_GET['edit']));
+   $edit_category = $edit_sql->fetch(PDO::FETCH_ASSOC);
+
+}
 
 //Brisanje kategorije
 
 if(isset($_GET['delete']) && !empty($_GET['delete'])){
-  $delete_id = (int)$_GET['delete'];
-  $delete_id = sanitize($delete_id);
 
 //Brisanje kategorije ako je Parent obrisan
-  $sql= $veza->prepare ("SELECT * FROM categories WHERE id = $delete_id");
-   $sql->execute(array('delete_id' => $delete_id));
+  $sql= $veza->prepare ("SELECT * FROM categories WHERE id = :delete_id");
+   $sql->execute(array('delete_id' => $_GET['delete']));
   $category = $sql->fetch(PDO::FETCH_ASSOC);
   if($category['parent'] == 0){
 
-    $sql= $veza->prepare("DELETE FROM categories WHERE parent = $delete_id");
-    $sql->execute();
+    $sql= $veza->prepare("DELETE FROM categories WHERE parent = :delete_id");
+	$sql->execute(array('delete_id' => $_GET['delete']));
   }
 
 
 
-  $dsql=$veza->prepare("DELETE FROM categories WHERE id = '$delete_id'");
-	$dsql->execute($_GET);
+  $dsql=$veza->prepare("DELETE FROM categories WHERE id = :delete_id");
+	$dsql->execute(array('delete_id' => $_GET['delete']));
   header("location: categories.php");
 
 
@@ -38,13 +51,18 @@ if(isset($_GET['delete']) && !empty($_GET['delete'])){
 
 
 
+
 //Procesiranje forme
 if (isset($_POST) && !empty($_POST)){
-  $parent = sanitize($_POST['parent']);
+  $post_parent = sanitize($_POST['parent']);
   $category =sanitize($_POST['category']);
 
 
-  $sqlform ="SELECT * FROM categories WHERE category = '$category' AND parent = '$parent'";
+  $sqlform ="SELECT * FROM categories WHERE category = '$category' AND parent = '$post_parent'";
+  if(isset($_GET['edit'])){
+    $id = $edit_category['id'];
+    $sqlform = "SELECT * FROM categories WHERE category ='$category' AND parent ='$post_parent' AND id != '$id'";
+  }
 
   $izraz3 = $veza->prepare($sqlform);
 $fresult =$izraz3->execute();
@@ -75,11 +93,25 @@ if(!empty($errors)){
   </script>
 <?php   }else{
 //Update na bazu
-$updatesql =$veza->prepare("INSERT INTO categories (category,parent) VALUES ('$category','$parent')");
+$updatesql =$veza->prepare("INSERT INTO categories (category,parent) VALUES ('$category','$post_parent')");
+if(isset($_GET['edit'])){
+$updatesql =$veza->prepare("UPDATE categories SET category = '$category', parent = '$post_parent' WHERE id = '$edit_id'");
+}
 $updatesql->execute();
 header('Location: categories.php');
 
 }
+}
+$category_value='';
+$parent_value=0;
+if(isset($_GET['edit'])){
+  $category_value = $edit_category['category'];
+  $parent_value = $edit_category['parent'];
+}else {
+  if(isset($_POST)){
+    $category_value = $category;
+    $parent_value= $post_parent;
+  }
 }
 
  ?>
@@ -94,18 +126,18 @@ header('Location: categories.php');
 <div class="large-12 columns">
   <div class="row collapse">
     <div class="small-4 columns">
-<form action ="categories.php" method="post" enctype="multipart/form-data">
-  <legend>Add a Category</legend>
+<form action ="categories.php<?=((isset($_GET['edit']))?'?edit='.$edit_id:'');?>" method="post" enctype="multipart/form-data">
+  <legend><?=((isset($_GET['edit']))?'Edit':'Add A');?> Category</legend>
   <div id="errors"></div>
 <!-- <label for="parent">Parent</label> -->
 <select class="form-control" name="parent" id="parent">
-  <option style="color: gray;" value="0">Parent</option>
+  <option style="color: gray;" value="0"<?=(($parent_value == 0)?' selected="selected"':'');?>>Parent</option>
   <?php while ($parent = $izraz->fetch(PDO::FETCH_ASSOC)): ?>
-           <option value="<?=$parent['id'];?>"><?=$parent['category'];?></option>
+           <option value="<?=$parent['id'];?>"<?=(($parent_value ==$parent['id'])?' selected="selected"':'');?>><?=$parent['category'];?></option>
   <?php endwhile?>
 </select>
-<input type="text" class="form-control" id="category" name="category" placeholder="Category" />
-<input type ="submit" value ="Add Category" class="button">
+<input type="text" class="form-control" id="category" name="category" placeholder="Category" value="<?=$category_value;?>" />
+<input type ="submit" value ="<?=((isset($_GET['edit']))?'Edit':'Add');?> Category" class="button">
 </form>
 
 </div>
