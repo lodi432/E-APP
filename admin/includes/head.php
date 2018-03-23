@@ -6,3 +6,4 @@
     <link rel="stylesheet" href="<?php echo $putanjaApp;?>css/foundation.css">
     <!-- <link rel="stylesheet" href="<?php echo $putanjaApp;?>css/main.css"> -->
     <link rel="stylesheet" href="<?php echo $putanjaApp;?>css/app.css">
+  

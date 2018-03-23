@@ -1,7 +1,63 @@
+
+
+
 <?php
 include_once "../konfiguracija.php";
 include 'includes/head.php';
 include 'includes/izbornik.php';
+
+if(isset($_GET['add'])){
+$brandQuery= $veza->prepare("SELECT * FROM brand ORDER BY brand;");
+$brandQuery->execute();
+$parentQuery =$veza->prepare("SELECT* FROM categories WHERE parent = 0 ORDER BY category;");
+$parentQuery->execute();
+
+?>
+
+<h2 class ="text-center">Add A New Product</h2><hr>
+
+<form action ="products.php?add=1" method="POST" enctype="multipart/form-data" >
+  <div class="row">
+   <div class="large-6 columns ">
+     <label for="title">Title*:
+        <input type="text" name="title" class="former" id="title" placeholder="large-12.columns" value="<?=((isset($_POST['title']))?sanitize($_POST['title']):'');?>"/>
+      </label>
+    </div>
+    <div class="large-6 columns">
+       <label for="brand">Brand*: </label>
+       <select class="form-group" id="brand" name="brand">
+            <option value=""<?=((isset($_POST['brand'])&& $_POST['brand']== '') ?' selected': '');?></option>
+            <?php  while ($brand = $brandQuery->fetch(PDO::FETCH_ASSOC)): ?>
+          <option value="<?=$brand['id']; ?>"<?= ((isset($_POST['brand'])&& $_POST['brand']==$brand['id'])?' selected':''); ?>><?php echo $brand['brand']; ?></option>
+          <?php endwhile; ?>
+       </select>
+</div>
+
+    <div class="large-6 columns ">
+      <label for="parent">Parent Category*:
+         <select class="form-group" id="parent" name="parent">
+         <option value =""<?=((isset($_POST['parent'])&& $_POST['parent']== '')?' selected':'');?>></option>
+
+         <?php while($parent = $parentQuery->fetch(PDO::FETCH_ASSOC)): ?>
+           <option value="<?=$parent['id'];?>"<?=((isset($_POST['parent']) && $_POST['parent'] == $parent['id'])?' select':'');?>><?=$parent['category'];?></option>
+
+         <?php endwhile; ?>
+
+       </label>
+       </select>
+     </div>
+     <div class="large-6 columns ">
+       <label for="child">Child Category:*</label>
+   			<select id="child" name="child" class="form-control">
+   </select>
+     </div>
+     </div>
+
+</form>
+
+<?php }else{
+
+
 
 
 $format = new NumberFormatter("en_US",NumberFormatter::CURRENCY);
@@ -70,6 +126,5 @@ if(isset($_GET['featured'])){
 </table>
 
 
-
-
-<?php include_once 'includes/scripts.php';?>
+<?php  } include_once 'includes/scripts.php';?>
+<?php include_once 'includes/podnozje.php'; ?>

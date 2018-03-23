@@ -3,7 +3,7 @@
 session_start();
 
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/FoundationFlex/config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/EcomApp/config.php';
 require_once BASEURL.'helpers/helpers.php';
 
 

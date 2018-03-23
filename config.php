@@ -1,2 +1,2 @@
 <?php
-define ('BASEURL',$_SERVER['DOCUMENT_ROOT'].'/FoundationFlex/');
+define ('BASEURL',$_SERVER['DOCUMENT_ROOT'].'/EcomApp/');
