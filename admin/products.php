@@ -1,6 +1,4 @@
 
-
-
 <?php
 include_once "../konfiguracija.php";
 include 'includes/head.php';
@@ -15,16 +13,8 @@ $parentQuery->execute();
 ?>
 
 
-<p><button class="button" data-toggle="sizesModal">Click me for a modal</button></p>
 
-<div class="reveal" id="sizesModal" data-reveal data-animation-in="fade-in" data-animation-out="fade-out">
-  <h1>Awesome!</h1>
-  <p class="lead">This is a modal!</p>
 
-  <button class="close-button" data-close aria-label="Close reveal" type="button">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
 
 
 <h2 class ="text-center">Add A New Product</h2><hr>
@@ -82,8 +72,7 @@ $parentQuery->execute();
 
 <div class="small-6 large-4 columns ">
   <label>Quantity & Sizes*: </label>
- <button class="button" onclick="jQuery('$sizesModal').modal('toggle');return false;">Quantity & Sizes</button>
- <!-- This is the first modal -->
+ <button class="button" id="kol">Quantity & Sizes</button>
 
 
 
@@ -93,15 +82,14 @@ $parentQuery->execute();
 <input type="text" class="form-control" name="size" id="size" value="<?=((isset($_POST['sizes']))?$_POST['sizes']:'');?>"readonly>
 
 
-
 </div>
 
-<div class="small-6 large-4 columns ">
+<div class="small-12 large-4 columns ">
  <label for="photo">Product Photo:</label>
  <input type="file" name="photo" id="photo" class="form-control">
 </div>
 
-<div class="small-6 large-4 columns">
+<div class="small-12 large-4 columns">
   <label for ="description">Description:</label>
   <textarea id="description" name="description" class="form-control" rows="6"><?=((isset($_POST['description']))?sanitize($_POST['description']):'');?></textarea>
 
@@ -114,6 +102,39 @@ $parentQuery->execute();
 
 </form>
 
+
+
+
+<div class="reveal" id="sizesModal" data-reveal data-animation-in="fade-in" data-options="closeOnClick:false;closeOnEsc:false;"  data-animation-out="fade-out" >
+<label for ="">Sizes & Qty</label>
+
+  <div class="row">
+  <?php for($i=1;$i<=12;$i++): ?>
+       <div class="small-4 medium-4 columns ">
+          <label for= "size<?=$i;?>">Size:</label>
+          <input type="text" name="size<?=$i;?>" id="size<?=$i;?>" value ="">
+
+       </div>
+       <div class="small-2 medium-2 columns ">
+        <label for= "qty<?=$i;?>">Quantity:</label>
+          <input type="number" name="qty<?=$i;?>" id="qty<?=$i;?>" value ="" min="0">
+
+       </div>
+  <?php endfor; ?>
+</div>
+
+  <button class="close-button" data-close aria-label="Close reveal" type="button">
+
+
+
+    <span aria-hidden="true">&times;</span>
+
+</button>
+  <button class="button" data-toggle="modal" data-target="#sizesModal" click="updateSizes();jQuery('#sizesModal').modal('toggle');return false;"> Save Changes
+
+   </button>
+
+</div>
 
 
 
@@ -200,3 +221,16 @@ if(isset($_GET['featured'])){
 include_once 'includes/podnozje.php';
 include_once 'includes/scripts.php';
 ?>
+<script>
+$("#kol").click(function(){
+
+  $("#sizesModal").foundation("open");
+
+
+
+
+
+
+  return false;
+});
+</script>
