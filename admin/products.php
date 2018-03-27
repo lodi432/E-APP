@@ -3,13 +3,74 @@
 include_once "../konfiguracija.php";
 include 'includes/head.php';
 include 'includes/izbornik.php';
-
 if(isset($_GET['add'])){
 $brandQuery= $veza->prepare("SELECT * FROM brand ORDER BY brand;");
 $brandQuery->execute();
 $parentQuery =$veza->prepare("SELECT* FROM categories WHERE parent = 0 ORDER BY category;");
 $parentQuery->execute();
 
+if($_POST){
+  $title = ((isset($_POST['title']) && $_POST['title'] !='')?sanitize($_POST['title']):'');
+$brand = ((isset($_POST['brand']) && !empty($_POST['brand']))?sanitize($_POST['brand']):'');
+$parent = ((isset($_POST['parent']) && !empty($_POST['parent']))?sanitize($_POST['parent']):'');
+$category = ((isset($_POST['child']))&& !empty ($_POST['child'])?sanitize($_POST['child']): '');
+$price = ((isset($_POST['price']) && $_POST['price'] !='')?sanitize($_POST['price']):'');
+$list_price = ((isset($_POST['list_price']) && $_POST['list_price'] !='')?sanitize($_POST['list_price']):'');
+$description = ((isset($_POST['description']) && $_POST['description'] !='')?sanitize($_POST['description']):'');
+$sizes = ((isset($_POST['sizes']) && $_POST['sizes'] !='')?sanitize($_POST['sizes']):'');
+$sizes=rtrim($sizes,',');
+$saved_image = '' ;
+
+  $erros= array();
+
+  $required = array('title','brand','price','parent','child');
+   foreach($required as $field){
+     if($_POST[$field]==''){
+       $errors[]= 'All fields With and Astrisk are required.';
+       break;
+     }
+   }
+   if(!empty($_FILES)){
+     var_dump($_FILES);
+     $photo = $_FILES['photo'];
+    $name = $photo['name'];
+    $nameArray = explode('.',$name);
+    $fileName = $nameArray[0];
+    $fileExt = $nameArray[1];
+    $mime = explode('/',$photo['type']);
+    $mimeType = $mime[0];
+    $mimeExt = $mime[1];
+    $tmpLoc = $photo['tmp_name'];
+    $fileSize = $photo['size'];
+    $allowed = array ('png','jpg','jpeg','gif');
+    $uploadName = md5(microtime()).'.'.$fileExt;
+    $uploadPath = BASEURL.'images/products/'.$uploadName;
+    $dbpath = '/EcomApp/images/products/'.$uploadName;
+
+        if ($mimeType != 'image') {
+          $errors [] ='The file must be an image.' ;
+           }
+           if (!in_array($fileExt, $allowed)) {
+             $errors[] = 'The file extension must be a png,jpg,jpeg, or gif.';
+           }
+           if($fileSize > 15000000){
+             $errors[] = 'The file size must be under 15MB.';
+           }
+           if ($fileExt != $mimeExt && ($mimeExt == 'jpg' && $fileExt != 'jpg')) {
+                $errors [] = 'File extension does not match the file.';
+           }
+        }
+       if (!empty($errors)){
+         echo display_errors($errors);
+       } else {
+     //upload file and instert into database
+           move_uploaded_file($tmpLoc,$uploadPath);
+           $insertSql=$veza->prepare("INSERT INTO products (`title`,`price`,`list_price`,`brand`,`categories`,`sizes`,`image`,`description`)
+       VALUES ('$title','$price','$list_price','$brand','$category','$sizes','$dbpath','$description');");
+       $insertSql->execute();
+       header('Location: products.php');
+   }
+}
 ?>
 
 
@@ -66,7 +127,7 @@ $parentQuery->execute();
        <input type="text" id="price" name="price" class="form-control" value="<?=((isset($_POST['price']))?sanitize($_POST['price']):"");?>">
  </div>
  <div class="small-6 large-4 columns ">
- <label for="list_price">List Price*: </label>
+ <label for="list_price">List Price: </label>
  <input type="text" id="list_price" name="price" class="form-control" value="<?=((isset($_POST['list_price']))?sanitize($_POST['list_price']):"");?>">
 </div>
 
@@ -79,7 +140,7 @@ $parentQuery->execute();
 </div>
 <div class="small-6 large-4 columns ">
 <label for ="sizes">Sizes & Qty Preview</label>
-<input type="text" class="form-control" name="size" id="size" value="<?=((isset($_POST['sizes']))?$_POST['sizes']:'');?>"readonly>
+<input type="text" class="form-control" name="size" id="sizes" value="<?=((isset($_POST['sizes']))?$_POST['sizes']:'');?>"readonly>
 
 
 </div>
@@ -100,6 +161,9 @@ $parentQuery->execute();
 </div>
 
 
+<input type="hidden" name="qtyandsizes" id="qtyandsizes" />
+
+
 </form>
 
 
@@ -111,13 +175,13 @@ $parentQuery->execute();
   <div class="row">
   <?php for($i=1;$i<=12;$i++): ?>
        <div class="small-4 medium-4 columns ">
-          <label for= "size<?=$i;?>">Size:</label>
-          <input type="text" name="size<?=$i;?>" id="size<?=$i;?>" value ="">
+          <label for= "size_<?=$i;?>">Size:</label>
+          <input type="text"  id="size_<?=$i;?>" value ="<?=((!empty($sArray[$i-1]))?$sArray[$i-1]:'');?>">
 
        </div>
        <div class="small-2 medium-2 columns ">
-        <label for= "qty<?=$i;?>">Quantity:</label>
-          <input type="number" name="qty<?=$i;?>" id="qty<?=$i;?>" value ="" min="0">
+        <label for= "qty_<?=$i;?>">Quantity:</label>
+          <input type="number"  id="qty_<?=$i;?>" value ="" min="0">
 
        </div>
   <?php endfor; ?>
@@ -130,7 +194,7 @@ $parentQuery->execute();
     <span aria-hidden="true">&times;</span>
 
 </button>
-  <button class="button" data-toggle="modal" data-target="#sizesModal" click="updateSizes();jQuery('#sizesModal').modal('toggle');return false;"> Save Changes
+  <button class="button"  id="saveChangesSizes"> Save Changes
 
    </button>
 
@@ -141,10 +205,6 @@ $parentQuery->execute();
 
 
 <?php }else{
-
-
-
-
 $format = new NumberFormatter("en_US",NumberFormatter::CURRENCY);
 $izraz = $veza->prepare("SELECT * FROM products WHERE deleted = 0;");
 $presults= $izraz->execute();
@@ -155,9 +215,6 @@ if(isset($_GET['featured'])){
   $izdvojeni->execute();
    header('Location: products.php');
 }
-
-
-
 ?>
 
 
@@ -222,15 +279,34 @@ include_once 'includes/podnozje.php';
 include_once 'includes/scripts.php';
 ?>
 <script>
+
+
+$("#saveChangesSizes").click(function(){
+	console.log("1");
+	var velicine="";
+	var niz=new Array();
+	for(var i=1; i<=12;i++){
+		if($("#size_" + i).val()!=""){
+			niz.push({size: $("#size_" + i).val(), qty: $("#qty_" + i).val()});
+			velicine+=$("#size_" + i).val() + ":" + $("#qty_" + i).val() + ",";
+		}
+	}
+	console.log(niz);
+	if(velicine.length>0){
+		velicine=velicine.substring(0,velicine.length-1);
+	}
+	$("#qtyandsizes").val(JSON.stringify(niz));
+
+	$("#sizes").val(velicine);
+	 $("#sizesModal").foundation("close");
+	 return false;
+});
+
+
+
+
 $("#kol").click(function(){
-
   $("#sizesModal").foundation("open");
-
-
-
-
-
-
   return false;
 });
 </script>
