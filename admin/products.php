@@ -3,17 +3,37 @@
 include_once "../konfiguracija.php";
 include 'includes/head.php';
 include 'includes/izbornik.php';
-if(isset($_GET['add'])){
+if(isset($_GET['add']) || isset($_GET['edit'])){
 $brandQuery= $veza->prepare("SELECT * FROM brand ORDER BY brand;");
 $brandQuery->execute();
 $parentQuery =$veza->prepare("SELECT* FROM categories WHERE parent = 0 ORDER BY category;");
 $parentQuery->execute();
-
-if($_POST){
-  $title = ((isset($_POST['title']) && $_POST['title'] !='')?sanitize($_POST['title']):'');
+$title = ((isset($_POST['title']) && $_POST['title'] !='')?sanitize($_POST['title']):'');
 $brand = ((isset($_POST['brand']) && !empty($_POST['brand']))?sanitize($_POST['brand']):'');
 $parent = ((isset($_POST['parent']) && !empty($_POST['parent']))?sanitize($_POST['parent']):'');
 $category = ((isset($_POST['child']))&& !empty ($_POST['child'])?sanitize($_POST['child']): '');
+
+
+if(isset($_GET['edit'])){
+    $edit_id = (int)$_GET['edit'];
+    $productResults = $veza->prepare("SELECT * FROM products WHERE id = '$edit_id';");
+    $productResults->execute();
+      $product=$productResults->fetch(PDO::FETCH_ASSOC);
+      $category = ((isset($_POST['child']) && $_POST['child'] != '')?sanitize($_POST['child']):$product['categories']);
+      $title = ((isset($_POST['title']) && $_POST['title'] != '')?sanitize($_POST['title']):$product['title']);
+      $brand = ((isset($_POST['brand']) && $_POST['brand'] != '')?sanitize($_POST['brand']):$product['brand']);
+      $parentIzraz = $veza->prepare ("SELECT * FROM categories WHERE id = '$category';");
+      $parentIzraz->execute();
+      $parentResult=$parentIzraz->fetch(PDO::FETCH_ASSOC);
+      $parent = ((isset($_POST['parent']) && $_POST['parent'] != '')?sanitize($_POST['parent']):$parentResult['parent']);
+
+
+
+
+     }
+
+if($_POST){
+
 $price = ((isset($_POST['price']) && $_POST['price'] !='')?sanitize($_POST['price']):'');
 $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] !='')?sanitize($_POST['list_price']):'');
 $description = ((isset($_POST['description']) && $_POST['description'] !='')?sanitize($_POST['description']):'');
@@ -78,24 +98,24 @@ $saved_image = '' ;
 
 
 
-<h2 class ="text-center">Add A New Product</h2><hr>
+<h2 class ="text-center"><?=((isset($_GET['edit']))?'Edit':'Add A New');?> Product</h2><hr>
 
-<form action ="products.php?add=1" method="POST" enctype="multipart/form-data" >
+<form action ="products.php?<?=((isset($_GET['edit']))?'edit='.$edit_id:'add=1');?>" method="POST" enctype="multipart/form-data" >
 
 
 
   <div class="row">
    <div class="small-6 large-6 columns ">
      <label for="title">Title*:
-        <input type="text" name="title" class="former" id="title" placeholder="large-12.columns" value="<?=((isset($_POST['title']))?sanitize($_POST['title']):'');?>"/>
+        <input type="text" name="title" class="former" id="title" placeholder="large-12.columns" value="<?=$title;?>"/>
       </label>
     </div>
     <div class="small-6 large-6 columns">
        <label for="brand">Brand*: </label>
        <select class="form-group" id="brand" name="brand">
-            <option value=""<?=((isset($_POST['brand'])&& $_POST['brand']== '') ?' selected': '');?></option>
-            <?php  while ($brand = $brandQuery->fetch(PDO::FETCH_ASSOC)): ?>
-          <option value="<?=$brand['id']; ?>"<?= ((isset($_POST['brand'])&& $_POST['brand']==$brand['id'])?' selected':''); ?>><?php echo $brand['brand']; ?></option>
+            <option value=""<?=(($brand=='')?' selected':'');?>></option>
+            <?php  while ($_brand= $brandQuery->fetch(PDO::FETCH_ASSOC)): ?>
+          <option value="<?=$_brand['id'];?>"<?=(($brand== $_brand ['id'])?' selected':'');?>><?=$_brand['brand'];?></option>
           <?php endwhile; ?>
        </select>
 </div>
@@ -105,10 +125,10 @@ $saved_image = '' ;
     <div class="small-6 large-6 columns ">
       <label for="parent">Parent Category*:
          <select class="form-group" id="parent" name="parent">
-         <option value =""<?=((isset($_POST['parent'])&& $_POST['parent']== '')?' selected':'');?>></option>
+         <option value =""<?=(($parent== '')?' selected':'');?>></option>
 
-         <?php while($parent = $parentQuery->fetch(PDO::FETCH_ASSOC)): ?>
-           <option value="<?=$parent['id'];?>"<?=((isset($_POST['parent']) && $_POST['parent'] == $parent['id'])?' select':'');?>><?=$parent['category'];?></option>
+         <?php while($_parent = $parentQuery->fetch(PDO::FETCH_ASSOC)): ?>
+           <option value="<?=$_parent['id'];?>"<?=(($parent == $_parent['id'])?' selected':'');?>><?=$_parent['category'];?></option>
 
          <?php endwhile; ?>
 
@@ -155,9 +175,9 @@ $saved_image = '' ;
   <textarea id="description" name="description" class="form-control" rows="6"><?=((isset($_POST['description']))?sanitize($_POST['description']):'');?></textarea>
 
 </div>
-
+<a href="products.php" class="button">Cancel</a>
 <div class="small-6 large-3 columns ">
-<input type="submit" value="Add Product" class="button  " >
+<input type="submit" value="<?=((isset($_GET['edit']))?'Edit':'Add');?> Product" class="button  " >
 </div>
 
 
