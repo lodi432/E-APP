@@ -299,7 +299,10 @@ include_once 'includes/podnozje.php';
 include_once 'includes/scripts.php';
 ?>
 <script>
+jQuery('document').ready(function(){
+  get_child_options('<?=$category;?>');
 
+});
 
 $("#saveChangesSizes").click(function(){
 	console.log("1");

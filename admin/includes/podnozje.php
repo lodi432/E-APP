@@ -20,12 +20,15 @@ function updateSizes() {
 
 
 
-function get_child_options(){
+function get_child_options(selected){
+  if(typeof selected === 'undefined'){
+    var selected ='';
+}
 	var parentID = jQuery('#parent').val();
 	jQuery.ajax({
 	     url: '/EcomApp/admin/parsers/child_categories.php',
 	     type: 'POST',
-	     data: {parentID : parentID},
+	     data: {parentID : parentID, selected:selected},
 	     success: function(data){
 	        jQuery('#child').html(data);
 	     },
