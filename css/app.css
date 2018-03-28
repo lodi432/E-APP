@@ -88,3 +88,8 @@ background-color: #52ADCB;
 #add-product-btn{
   margin-top: -35px;
 }
+
+.savedimg img{
+  width:200px;
+  height:auto;
+}

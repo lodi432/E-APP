@@ -3,6 +3,7 @@
 include_once "../konfiguracija.php";
 include 'includes/head.php';
 include 'includes/izbornik.php';
+$dbpath='';
 if(isset($_GET['add']) || isset($_GET['edit'])){
 $brandQuery= $veza->prepare("SELECT * FROM brand ORDER BY brand;");
 $brandQuery->execute();
@@ -15,6 +16,8 @@ $category = ((isset($_POST['child']))&& !empty ($_POST['child'])?sanitize($_POST
 $price = ((isset($_POST['price']) && $_POST['price'] !='')?sanitize($_POST['price']):'');
 $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] !='')?sanitize($_POST['list_price']):'');
 $description = ((isset($_POST['description']) && $_POST['description'] !='')?sanitize($_POST['description']):'');
+$sizes = ((isset($_POST['sizes']) && $_POST['sizes'] !='')?sanitize($_POST['sizes']):'');
+$saved_image = '';
 
 
 
@@ -24,6 +27,14 @@ if(isset($_GET['edit'])){
     $productResults = $veza->prepare("SELECT * FROM products WHERE id = '$edit_id';");
     $productResults->execute();
       $product=$productResults->fetch(PDO::FETCH_ASSOC);
+      if (isset($_GET['delete_image'])){
+        $image_url = $_SERVER['DOCUMENT_ROOT'].$product['image']; echo $image_url;
+        unlink($image_url);
+        $izrazDel= $veza->prepare("UPDATE products SET image = ''WHERE id = '$edit_id';");
+        $izrazDel->execute();
+        header('Location: products.php?edit='.$edit_id);
+
+      }
       $category = ((isset($_POST['child']) && $_POST['child'] != '')?sanitize($_POST['child']):$product['categories']);
       $title = ((isset($_POST['title']) && $_POST['title'] != '')?sanitize($_POST['title']):$product['title']);
       $brand = ((isset($_POST['brand']) && $_POST['brand'] != '')?sanitize($_POST['brand']):$product['brand']);
@@ -34,10 +45,9 @@ if(isset($_GET['edit'])){
       $price = ((isset($_POST['price']) && $_POST['price'] != '')?sanitize($_POST['price']):$product['price']);
       $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] != '')?sanitize($_POST['list_price']):$product['list_price']);
       $description = ((isset($_POST['description']) && $_POST['description'] != '')?sanitize($_POST['description']):$product['description']);
-
-
-
-
+      $sizes = ((isset($_POST['sizes']) && $_POST['sizes'] != '')?sanitize($_POST['sizes']):$product['sizes']);
+      $saved_image = (($product['image'] !='')?$product['image']:'');
+      $dbpath = $saved_image;
      }
 
 if($_POST){
@@ -95,6 +105,11 @@ $saved_image = '' ;
            move_uploaded_file($tmpLoc,$uploadPath);
            $insertSql=$veza->prepare("INSERT INTO products (`title`,`price`,`list_price`,`brand`,`categories`,`sizes`,`image`,`description`)
        VALUES ('$title','$price','$list_price','$brand','$category','$sizes','$dbpath','$description');");
+      if(isset($_GET['edit'])){
+        $insertSql = $veza->prepare("UPDATE products SET title = '$title',price='$price',list_price ='$list_price',
+            brand= '$brand',categories='$category',sizes='$sizes',image='$dbpath', description= '$description'
+            WHERE id='$edit_id';");
+      }
        $insertSql->execute();
        header('Location: products.php');
    }
@@ -168,14 +183,22 @@ $saved_image = '' ;
 </div>
 <div class="small-6 large-4 columns ">
 <label for ="sizes">Sizes & Qty Preview</label>
-<input type="text" class="form-control" name="size" id="sizes" value="<?=((isset($_POST['sizes']))?$_POST['sizes']:'');?>"readonly>
+<input type="text" class="form-control" name="size" id="sizes" value="<?=$sizes;?>"readonly>
 
 
 </div>
 
 <div class="small-12 large-4 columns ">
- <label for="photo">Product Photo:</label>
+  <?php if($saved_image != ''):?>
+    <div class="savedimg">
+       <img src="<?=$saved_image;?>"alt="saved image"/><br><br>
+        <a href="products.php?delete_image=1&edit=<?=$edit_id;?>" class="button label alert">Delete Image</a>
+    </div>
+
+<?php else: ?>
+   <label for="photo">Product Photo:</label>
  <input type="file" name="photo" id="photo" class="form-control">
+<?php endif;?>
 </div>
 
 <div class="small-12 large-4 columns">
