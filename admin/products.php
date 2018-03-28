@@ -14,6 +14,7 @@ $parent = ((isset($_POST['parent']) && !empty($_POST['parent']))?sanitize($_POST
 $category = ((isset($_POST['child']))&& !empty ($_POST['child'])?sanitize($_POST['child']): '');
 $price = ((isset($_POST['price']) && $_POST['price'] !='')?sanitize($_POST['price']):'');
 $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] !='')?sanitize($_POST['list_price']):'');
+$description = ((isset($_POST['description']) && $_POST['description'] !='')?sanitize($_POST['description']):'');
 
 
 
@@ -32,6 +33,7 @@ if(isset($_GET['edit'])){
       $parent = ((isset($_POST['parent']) && $_POST['parent'] != '')?sanitize($_POST['parent']):$parentResult['parent']);
       $price = ((isset($_POST['price']) && $_POST['price'] != '')?sanitize($_POST['price']):$product['price']);
       $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] != '')?sanitize($_POST['list_price']):$product['list_price']);
+      $description = ((isset($_POST['description']) && $_POST['description'] != '')?sanitize($_POST['description']):$product['description']);
 
 
 
@@ -178,7 +180,7 @@ $saved_image = '' ;
 
 <div class="small-12 large-4 columns">
   <label for ="description">Description:</label>
-  <textarea id="description" name="description" class="form-control" rows="6"><?=((isset($_POST['description']))?sanitize($_POST['description']):'');?></textarea>
+  <textarea id="description" name="description" class="form-control" rows="6"><?=$description;?></textarea>
 
 </div>
 <a href="products.php" class="button">Cancel</a>
