@@ -3,6 +3,15 @@
 include_once "../konfiguracija.php";
 include 'includes/head.php';
 include 'includes/izbornik.php';
+
+//Delete Product
+if(isset($_GET['delete'])){
+  $id = sanitize($_GET['delete']);
+  $obrisana=$veza->prepare("UPDATE products SET deleted = 1, featured = 0 WHERE id='$id';");
+  $obrisana->execute();
+  header('Location: products.php');
+}
+
 $dbpath='';
 if(isset($_GET['add']) || isset($_GET['edit'])){
 $brandQuery= $veza->prepare("SELECT * FROM brand ORDER BY brand;");
