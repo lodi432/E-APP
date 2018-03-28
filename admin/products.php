@@ -12,6 +12,10 @@ $title = ((isset($_POST['title']) && $_POST['title'] !='')?sanitize($_POST['titl
 $brand = ((isset($_POST['brand']) && !empty($_POST['brand']))?sanitize($_POST['brand']):'');
 $parent = ((isset($_POST['parent']) && !empty($_POST['parent']))?sanitize($_POST['parent']):'');
 $category = ((isset($_POST['child']))&& !empty ($_POST['child'])?sanitize($_POST['child']): '');
+$price = ((isset($_POST['price']) && $_POST['price'] !='')?sanitize($_POST['price']):'');
+$list_price = ((isset($_POST['list_price']) && $_POST['list_price'] !='')?sanitize($_POST['list_price']):'');
+
+
 
 
 if(isset($_GET['edit'])){
@@ -26,6 +30,8 @@ if(isset($_GET['edit'])){
       $parentIzraz->execute();
       $parentResult=$parentIzraz->fetch(PDO::FETCH_ASSOC);
       $parent = ((isset($_POST['parent']) && $_POST['parent'] != '')?sanitize($_POST['parent']):$parentResult['parent']);
+      $price = ((isset($_POST['price']) && $_POST['price'] != '')?sanitize($_POST['price']):$product['price']);
+      $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] != '')?sanitize($_POST['list_price']):$product['list_price']);
 
 
 
@@ -144,11 +150,11 @@ $saved_image = '' ;
 
        <div class="small-6 large-4 columns ">
        <label for="price">Price*: </label>
-       <input type="text" id="price" name="price" class="form-control" value="<?=((isset($_POST['price']))?sanitize($_POST['price']):"");?>">
+       <input type="text" id="price" name="price" class="form-control" value="<?=$price;?>">
  </div>
  <div class="small-6 large-4 columns ">
  <label for="list_price">List Price: </label>
- <input type="text" id="list_price" name="price" class="form-control" value="<?=((isset($_POST['list_price']))?sanitize($_POST['list_price']):"");?>">
+ <input type="text" id="list_price" name="price" class="form-control" value="<?=$list_price;?>">
 </div>
 
 <div class="small-6 large-4 columns ">
